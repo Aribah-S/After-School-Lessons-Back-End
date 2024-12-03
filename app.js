@@ -44,6 +44,28 @@ MongoClient.connect(url)
       res.send("Hello, World! MongoDB connected.");
     });
 
+    app.post("/collection/:collectionName/addMany", async (req, res) => {
+      try {
+        let collection = db.collection(req.params.collectionName);
+        const result = await collection.insertMany(req.body);
+        return res.send(result);
+      } catch (err) {
+        console.error("Error adding multi records to db:", err);
+        return res.status(500).send("Error adding multi records to db");
+      }
+    });
+
+    app.post("/collection/:collectionName/addOne", async (req, res) => {
+      try {
+        let collection = db.collection(req.params.collectionName);
+        const result = await collection.insertOne(req.body);
+        return res.send(result);
+      } catch (err) {
+        console.error("Error adding single record to db:", err);
+        return res.status(500).send("Error adding single record to db");
+      }
+    });
+
     app.use(function (req, res) {
       res.status(404);
       res.send("Path not found!");
