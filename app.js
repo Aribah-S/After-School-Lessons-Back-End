@@ -43,6 +43,11 @@ MongoClient.connect(url)
     app.get("/", (req, res) => {
       res.send("Hello, World! MongoDB connected.");
     });
+
+    app.use(function (req, res) {
+      res.status(404);
+      res.send("Path not found!");
+    });
   })
   .catch((err) => {
     console.error("Error connecting to MongoDB:", err);
