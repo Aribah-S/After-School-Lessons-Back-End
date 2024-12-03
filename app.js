@@ -1,4 +1,5 @@
 const express = require("express");
+const { MongoClient, ObjectId } = require("mongodb");
 
 var path = require("path");
 var fs = require("fs");
@@ -7,6 +8,11 @@ const app = express();
 
 const port = 3005;
 
+const url =
+  "mongodb+srv://aribahshasmeen:fullstack@cluster0.ghnuw.mongodb.net/";
+const dbName = "afterSchoolLessons";
+
+let db;
 
 app.use(express.json());
 
@@ -29,8 +35,19 @@ app.use(function (req, res, next) {
   });
 });
 
+MongoClient.connect(url)
+  .then((client) => {
+    console.log("Connected to MongoDB");
+    db = client.db(dbName);
 
-    
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    app.get("/", (req, res) => {
+      res.send("Hello, World! MongoDB connected.");
+    });
+  })
+  .catch((err) => {
+    console.error("Error connecting to MongoDB:", err);
   });
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
