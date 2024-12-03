@@ -77,6 +77,19 @@ MongoClient.connect(url)
       }
     });
 
+    app.put("/collection/:collectionName/update/:id", async (req, res) => {
+      try {
+        let collection = db.collection(req.params.collectionName);
+        const filter = { _id: new ObjectId(req.params.id) };
+        const updateDocument = { $set: req.body };
+        const result = await collection.updateOne(filter, updateDocument);
+        return res.send(result);
+      } catch (err) {
+        console.error("Error while trying to update record:", err);
+        return res.status(500).send("Error while trying to update record");
+      }
+    });
+
     app.use(function (req, res) {
       res.status(404);
       res.send("Path not found!");
