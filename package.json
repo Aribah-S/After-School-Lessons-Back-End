@@ -1,0 +1,17 @@
+{
+  "name": "after-school-lessons-back-end",
+  "version": "1.0.0",
+  "description": "back-end-server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
+  },
+  "author": "Aribah",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "mongodb": "^6.11.0",
+    "nodemon": "^3.1.7"
+  }
+}
