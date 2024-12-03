@@ -66,6 +66,17 @@ MongoClient.connect(url)
       }
     });
 
+    app.get("/collection/:collectionName", async (req, res) => {
+      try {
+        const collection = db.collection(req.params.collectionName);
+        const items = await collection.find({}).toArray();
+        return res.json(items);
+      } catch (err) {
+        console.error("Error fetching items:", err);
+        return res.status(500).send("Error fetching items");
+      }
+    });
+
     app.use(function (req, res) {
       res.status(404);
       res.send("Path not found!");
