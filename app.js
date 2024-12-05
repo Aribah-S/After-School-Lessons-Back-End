@@ -35,6 +35,7 @@ app.use(express.json());
 app.use(function (req, res, next) {
   console.log("Request IP: " + req.url);
   console.log("Request Body: " + JSON.stringify(req.body));
+  console.log("Request Query Params: " + JSON.stringify(req.query));
   console.log("Request date: " + new Date());
   next();
 });
@@ -93,6 +94,41 @@ MongoClient.connect(url)
       }
     });
 
+    app.get("/collection/:collectionName/search", async (req, res) => {
+      try {
+        const collection = db.collection(req.params.collectionName);
+
+        const query = req.query.value;
+
+        if (!query) {
+          return res.status(400).json({ error: "Query parameter is required" });
+        }
+
+        const searchQuery = {};
+
+        if (!isNaN(query)) {
+          // this is to check if the query is a number
+          const queryNumber = parseInt(query);
+          searchQuery.$or = [
+            { price: queryNumber },
+            { availableInventory: queryNumber },
+            { rating: queryNumber },
+          ];
+        } else {
+          searchQuery.$or = [
+            { title: { $regex: query, $options: "i" } }, //regex is for string matching and $options: "i" is for implementing case-insensitivity
+            { location: { $regex: query, $options: "i" } },
+            { description: { $regex: query, $options: "i" } },
+          ];
+        }
+        const items = await collection.find(searchQuery).toArray();
+        return res.json(items);
+      } catch (err) {
+        console.error("Error fetching items:", err);
+        return res.status(500).send("Error fetching items");
+      }
+    });
+
     app.put("/collection/:collectionName/update/:id", async (req, res) => {
       try {
         let collection = db.collection(req.params.collectionName);
@@ -116,5 +152,5 @@ MongoClient.connect(url)
   });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on port: ${port}`);
 });
