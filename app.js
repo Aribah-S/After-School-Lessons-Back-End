@@ -30,9 +30,10 @@ const dbName = "afterSchoolLessons";
 
 let db;
 
-app.use(express.json());
+app.use(express.json()); // middleware to use json
 
 app.use(function (req, res, next) {
+  // logging middleware
   console.log("Request IP: " + req.url);
   console.log("Request Body: " + JSON.stringify(req.body));
   console.log("Request Query Params: " + JSON.stringify(req.query));
@@ -41,6 +42,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
+  // static image file middleware
   var filePath = path.join(__dirname, "static", req.url);
   fs.stat(filePath, function (err, fileInfo) {
     if (err) {
@@ -52,16 +54,18 @@ app.use(function (req, res, next) {
   });
 });
 
-MongoClient.connect(url)
+MongoClient.connect(url) // mongodb driver for node.js
   .then((client) => {
     console.log("Connected to MongoDB");
     db = client.db(dbName);
 
     app.get("/", (req, res) => {
+      // homepage API (back-end route / )
       res.send("Hello, World! MongoDB connected.");
     });
 
     app.post("/collection/:collectionName/addMany", async (req, res) => {
+      // addMany API for either lessons or orders or any other collection in the database
       try {
         let collection = db.collection(req.params.collectionName);
         const result = await collection.insertMany(req.body);
@@ -73,6 +77,7 @@ MongoClient.connect(url)
     });
 
     app.post("/collection/:collectionName/addOne", async (req, res) => {
+      // addOne API for either lessons or orders or any other collection in the database
       try {
         let collection = db.collection(req.params.collectionName);
         const result = await collection.insertOne(req.body);
@@ -84,6 +89,7 @@ MongoClient.connect(url)
     });
 
     app.get("/collection/:collectionName", async (req, res) => {
+      // GET API for retreiving data in any collection in database in Array structure
       try {
         const collection = db.collection(req.params.collectionName);
         const items = await collection.find({}).toArray();
@@ -95,6 +101,7 @@ MongoClient.connect(url)
     });
 
     app.get("/collection/:collectionName/search", async (req, res) => {
+      // GET API for search functionality (filters across any field in the table)
       try {
         const collection = db.collection(req.params.collectionName);
 
@@ -130,6 +137,7 @@ MongoClient.connect(url)
     });
 
     app.put("/collection/:collectionName/update/:id", async (req, res) => {
+      // API to update a record in the collection
       try {
         let collection = db.collection(req.params.collectionName);
         const filter = { _id: new ObjectId(req.params.id) };
@@ -143,6 +151,7 @@ MongoClient.connect(url)
     });
 
     app.use(function (req, res) {
+      // middleware for Page not found 404 error
       res.status(404);
       res.send("Path not found!");
     });
@@ -152,5 +161,6 @@ MongoClient.connect(url)
   });
 
 app.listen(port, () => {
+  // log for checking the port number when the server is running
   console.log(`Server is running on port: ${port}`);
 });
